@@ -31,16 +31,22 @@ const (
 	defaultPathKey      = "helm.sh/path"
 	defaultNamespaceKey = "helm.sh/namespace"
 	defaultReleaseKey   = "helm.sh/release"
+
+	cps_path      = "chart_path"
+	cps_release   = "release"
+	cps_appkey    = "cps_appkey"
+	cps_namespace = "namespace"
 )
 
 var (
 	// Mapping between annotations attached by helm and
 	// label names that will be added to a metrics
-	helmAnnotationMapping = map[string]string{
-		defaultPathKey:      "chart_path",
-		defaultNamespaceKey: "namespace",
-		defaultReleaseKey:   "release",
-	}
+	// helmAnnotationMapping = map[string]string{
+	// 	defaultPathKey:      "chart_path",
+	// 	defaultNamespaceKey: "namespace",
+	// 	defaultReleaseKey:   "release",
+	// }
+	helmAnnotationMapping map[string]string
 )
 
 var (
@@ -59,6 +65,17 @@ type Controller struct {
 	dpController  *framework.Controller
 	dpStore       cache.Store
 	dpMapper      map[string]*api.PodList
+}
+
+func init() {
+	SetKey(defaultPathKey, defaultReleaseKey, defaultNamespaceKey)
+}
+
+func SetKey(pathKey, releaseKey, namespaceKey string) {
+	helmAnnotationMapping = make(map[string]string, 2)
+	helmAnnotationMapping[pathKey] = cps_path
+	helmAnnotationMapping[releaseKey] = cps_release
+	helmAnnotationMapping[namespaceKey] = cps_namespace
 }
 
 // NewController returns Controller instance or an error

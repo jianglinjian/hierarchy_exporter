@@ -33,6 +33,9 @@ var (
 		`Optional, if this controller is running in a kubernetes cluster, use the
 		pod secrets for creating a Kubernetes client.`,
 	)
+	pathKey      = getEnv("PATH_KEY", "helm.sh/path")
+	releaseKey   = getEnv("RELEASE_KEY", "helm.sh/release")
+	namespaceKey = getEnv("NAMESPACE_KEY", "helm.sh/namespace")
 )
 
 var landingPage = []byte(`<html>
@@ -45,6 +48,8 @@ var landingPage = []byte(`<html>
 `)
 
 func main() {
+	SetKey(pathKey, releaseKey, namespaceKey)
+
 	flags.AddGoFlagSet(flag.CommandLine)
 	flags.Parse(os.Args)
 	var client *k8s_client.Client
@@ -87,4 +92,11 @@ func main() {
 
 	log.Infoln("Listening on", *listenAddress)
 	log.Fatal(http.ListenAndServe(*listenAddress, nil))
+}
+
+func getEnv(name, def string) string {
+	if env := os.Getenv(name); env != "" {
+		return env
+	}
+	return def
 }
